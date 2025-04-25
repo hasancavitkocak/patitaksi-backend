@@ -19,6 +19,9 @@ app.use((req, res, next) => {
 // 👉 Rotalar
 const petRoutes = require("./routes/petRoutes");
 const userRoutes = require("./routes/userRoutes");
+const driverRoutes = require("./routes/driverRoutes");
+app.use("/api/drivers", driverRoutes);
+
 
 app.use("/api/pets", petRoutes);
 app.use("/api/users", userRoutes);
