@@ -1,11 +1,10 @@
 const express = require("express");
 const router = express.Router();
+const jwt = require("jsonwebtoken"); // JWT eklendi
 const User = require("../models/User");
 
-// Dummy şifre
 const DUMMY_CODE = "1234";
 
-// Telefon numarasıyla kayıt veya giriş
 router.post("/login", async (req, res) => {
   const { phone, code } = req.body;
 
@@ -21,10 +20,19 @@ router.post("/login", async (req, res) => {
     let user = await User.findOne({ phone });
 
     if (!user) {
-      user = await User.create({ phone }); // yeni kullanıcı oluştur
+      user = await User.create({ phone });
     }
 
-    res.status(200).json({ message: "Giriş başarılı", userId: user._id });
+    // ✅ Token üret
+    const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET || "gizliAnahtar123", {
+      expiresIn: "7d", // 7 gün geçerli olacak
+    });
+
+    res.status(200).json({
+      message: "Giriş başarılı",
+      userId: user._id,
+      token, // ✅ Frontend'e gönder
+    });
   } catch (err) {
     console.error(err);
     res.status(500).json({ message: "Sunucu hatası" });
